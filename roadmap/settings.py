@@ -134,8 +134,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-#   'https://localhost:8000', #REACT 개발 서버 주소
-#   'https://127.0.0.1:3000', #REACT 개발 서버 주소
+   'https://127.0.0.1:5500', #live server 주소
 
 ]
 CORS_ALLOW_CREDENTIALS = True
