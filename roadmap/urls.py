@@ -16,8 +16,10 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('api/users/', include('users.urls')), #users 앱으로 연결
+    path('api/main/', include('main.urls')), #main 앱으로 연결
 ]
