@@ -1,12 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from rest_framework import status, views
+from rest_framework import status, views, generics
 from rest_framework.response import Response
 from .serializers import UserCreationSerializer
-from rest_framework.permissions import AllowAny #누구나 접근 허용
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .models import UserProfile
+from .serializers import UserProfileSerializer
 
 class SignupView(views.APIView):
-  permission_classes = [AllowAny] #누구나 접근 허용
+  permission_classes = [AllowAny] #누구나 접근 허용 
 
   def post(self, request):
     serializer = UserCreationSerializer(data = request.data)
@@ -35,3 +37,13 @@ class LogoutView(views.APIView):
   def post(self,request):
     logout(request)
     return Response({'message' : '로그아웃되었습니다.'}, status = status.HTTP_200_OK)
+
+#RetrieveUpdateAPIView : 조회와 수정 둘 다 처리
+class UserProfileView(generics.RetrieveUpdateAPIView):
+  permission_classes = [IsAuthenticated] #로그인한 사용자만 접근 가능
+  queryset = UserProfile.objects.all()
+  serializer_class = UserProfileSerializer
+
+  def get_object(self):
+    # 현재 요청한 사용자의 프로필 반환
+    return self.request.user.profile
