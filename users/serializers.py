@@ -25,5 +25,4 @@ class UserCreationSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
   class Meta:
     model = UserProfile
-    #######수정!!
     fields = ['movement_condition', 'avoid_stairs','avoid_ramps','prefer_elevator']
