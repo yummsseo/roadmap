@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="with=device-width, initial-scale=1.0">
+    <title> 회원가입</title>
+   <link rel="stylesheet" href="style.css">
+  </head>
+   <body>
+    <header class="navbar">
+      <div class="logo">회원가입</div>
+      <nav>
+        <ul>
+          <li><a href="home.html">홈화면</a></li>
+          <li><a href="plan.html">길찾기</a></li>
+          <li><a href="report.html">장애물 신고하기</a></li>
+          <li><a href="setting.html">설정</a></li>
+        </ul>
+      </nav>
+      <div class="auth-buttons">
+        <button class="login" onclick="location.href='login.html'">로그인</button>
+        <button class="signin" onclick="location.href='signin.html'">회원가입</button>
+      </div>
+    </header>
+
+    <div class="signin-container">
+      <h2 class="title">계정 만들기</h2>
+      <p class="subtitle">개인 맞춤형,접근 가능한 내비게이션을 이용하기 위해 가입하세요.</p>
+
+      <form id="signupForm">
+        <label>이름(ID)</label>
+        <input type="text" placeholder="이름을 입력하세요." required>
+        <label>이메일 주소</label>
+        <input type="email" placeholder="주소를 입력하세요." required>
+        <label>비밀번호</label>
+        <input type="password" placeholder="안전한 비밀번호를 설정하세요." required>
+
+        <button type="submit" class="create-btn">계정 생성</button>
+      </form>
+
+      <p class="login-link">이미 계정이 있나요? <a href="login.html">로그인 하기</a></p>
+      <button class="cancel-btn">취소</button>
+    </div>
+    <script src="script.js"></script>
+    </body>
+    </html>
