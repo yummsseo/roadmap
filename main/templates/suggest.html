@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="with=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>장애물 신고하기</title>
+   <link rel="stylesheet" href="style.css">
+   <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=HRfwcjIwBt78mOxVBBGYH6MSQKPcv7SzadLC0GXh"></script>
+  </head>
+  <body>
+    <div id="alertBox" class="alert-hidden"></div>
+    <header class="navbar">
+      <div class="logo">모두의 길</div>
+      <nav>
+        <ul>
+          <li><a href="home.html">홈화면</a></li>
+          <li><a href="plan.html">길찾기</a></li>
+          <li><a href="suggest.html">건의하기</a></li>
+          <li><a href="setting.html">설정</a></li>
+        </ul>
+      </nav>
+      <div class="auth-buttons">
+        <button class="login" onclick="location.href='login.html'">로그인</button>
+        <button class="signin"onclick="location.href='signin.html'">회원가입</button>
+      </div>
+    </header>
+      <section class="hero">
+        <h1>건의하기</h1>
+        <p>더 나은 경로를 위해 건의하여 모두가 안전하게 이동할 수 있도록 도와주세요.</p>
+      </section>
+      <main class="suggest-container">
+        <form id="suggestForm">
+          <div class="how-to">
+            <h2>건의 방법</h2>
+            <p>위치를 입력하고 사진과 함께 건의하고 싶은 내용을 작성해주세요.</p>
+          </div>
+          <div class="suggest-card">
+            <h3>건의 내용</h3>
+            <label>장소 설명:</label>
+            <input type="text" id="location" placeholder="장소를 입력주세요(정확한 명칭으로 기입해주세요. ex.덕성여대,덕성여자대학교)"/>
+            <button type="button" id="searchLocation" class="search-btn">검색</button>
+            
+            <label>상세 설명:</label>
+            <textarea id="details" placeholder="건의하고 싶은 내용을 구체적으로 입력하세요"></textarea>
+            <div id="map" style="width:100%; height:350px; margin:15px 0; border-radius:10px;"></div>
+
+            <label>사진 첨부 (선택):</label>
+            <input type="file" id="photo" accept="image/*" />
+            <div class="preview-container">
+            <img id="preview" src="" alt="미리보기" style="max-width: 300px; display: none; border-radius: 8px;">
+          </div>
+          <div class="buttons">
+            <button  id="submitReport">신고 제출</button>
+            <button class="clear" type="reset">초기화</button>
+          </div>
+        </div>
+      </form>
+    </main>
+      <script src="script.js"></script>
+  </body>
+</html>
