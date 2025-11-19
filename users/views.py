@@ -37,13 +37,3 @@ class LogoutView(views.APIView):
   def post(self,request):
     logout(request)
     return Response({'message' : '로그아웃되었습니다.'}, status = status.HTTP_200_OK)
-
-#RetrieveUpdateAPIView : 조회와 수정 둘 다 처리
-class UserProfileView(generics.RetrieveUpdateAPIView):
-  permission_classes = [IsAuthenticated] #로그인한 사용자만 접근 가능
-  queryset = UserProfile.objects.all()
-  serializer_class = UserProfileSerializer
-
-  def get_object(self):
-    # 현재 요청한 사용자의 프로필 반환
-    return self.request.user.profile
