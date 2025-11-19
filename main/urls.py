@@ -1,9 +1,7 @@
-from django.contrib.auth import views as auth_views
 from django.urls import path
-from . import views
+from .views import Settingv, Notifyv
 
 urlpatterns = [
-  path('signup/', views.signup, name = 'signup'),
-  path('login/', views.login, name = 'login'),
-
-]
+    path('setting/', Settingv.as_view(),name='user_setting'),
+    path('notify/',Notifyv.as_view(),name='user_notify')
+ ]
