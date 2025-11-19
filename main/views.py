@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from .serializers import Settingser, Notifyser
 from .models import Setting, Notify
 from django.contrib.auth.models import User
@@ -12,8 +12,7 @@ from django.conf import settings
 
 # 설정
 class Settingv(APIView):
-    #permission_classes = [IsAuthenticated]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):        
         try:
@@ -45,11 +44,10 @@ class Settingv(APIView):
         except Setting.DoesNotExist:
             return Response({'status': 'error'}, status=status.HTTP_404_NOT_FOUND)
         
-# 신고
+# 건의
 class Notifyv(ListCreateAPIView):
     serializer_class = Notifyser
-    #permission_classes = [IsAuthenticated]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         locationtext = serializer.validated_data.get('location')

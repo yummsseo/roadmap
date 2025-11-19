@@ -24,7 +24,7 @@ class Settingser(serializers.ModelSerializer):
         ]
         read_only_fields = ['update_at']
 
-#고장신고
+#건의
 class Notifyser(serializers.ModelSerializer):
     class Meta:
         model = Notify
