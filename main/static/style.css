@@ -121,9 +121,6 @@ body{
   padding: 30px;
   background: #f4f4f4;
 }
-
-
-
 .suggest-header {
   text-align: center;
   background: linear-gradient(90deg, #0077cc, #00aacc);
@@ -385,67 +382,25 @@ body{
   line-height: 1.5;
 }
 
-.modal-overlay{
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.45);
-  z-index:0000;
-  justify-content: center;
-  align-items: center;
+.logout-area {
+    width: 100%;
+    text-align: center;
+    margin: 40px 0;
 }
 
-.modal-box{
-  background: white;
-  width: 450px;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
-  animation: fadeIn 0.25s ease;
+.logout-btn {
+    background: #ff4d4d;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.modal-header{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom: 15px;
-}
-
-.modal-header h2{
-  color:#17a34a;
-  font-size: 22px;
-}
-
-.modal-icon{
-  font-size:24px;
-  color:#17a34a;
-  font-weight: bold;
-}
-
-.modal-btn{
-  width: 100%;
-  padding: 12px 0;
-  margin-top: 20px;
-  background: #1a73e8;
-  color: white;
-  border:none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.modal-btn:hover{
-  background: #1669d4;
-}
-
-@keyframes fadeIn{
-  from{opacity: 0;transform: translateY(-10px);}
-  to{opacity: 1;transform: translateY(0);}
+.logout-btn:hover {
+    background: #e60000;
 }
 
 .profile-header{
@@ -553,7 +508,7 @@ h2 {
 
 
 
-.signin-container{
+.signup-container{
   width: 360px;
   background: #ffffff;
   padding: 30px 35px;
@@ -565,7 +520,7 @@ h2 {
   left:50%;
   transform: translateX(-50%);
 }
-.signin-container.title, .signin-container h2{
+.signup-container.title, .signup-container h2{
   text-align: left;
   font-size: 22px;
   font-weight: 700;
