@@ -75,3 +75,9 @@ class Notifyv(ListCreateAPIView):
         serializer.validated_data['latitude'] = latitude
         serializer.validated_data['longitude'] = longitude
         serializer.save()
+
+from django.shortcuts import render,redirect
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login
+
+# Create your views here.
