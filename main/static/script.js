@@ -103,3 +103,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 })
 
+window.onload = function () {
+    const name = localStorage.getItem("userName");
+    const email = localStorage.getItem("userEmail");
+
+    if (name) document.getElementById("userName").innerText = name;
+    if (email) document.getElementById("userEmail").innerText = email;
+};
+
+
