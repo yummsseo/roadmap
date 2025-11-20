@@ -121,10 +121,7 @@ body{
   padding: 30px;
   background: #f4f4f4;
 }
-
-
-
-.report-header {
+.suggest-header {
   text-align: center;
   background: linear-gradient(90deg, #0077cc, #00aacc);
   color: white;
@@ -132,25 +129,25 @@ body{
   border-radius: 0 0 20px 20px;
 }
 
-.report-header h1 {
+.suggest-header h1 {
   font-size: 32px;
   margin-bottom: 10px;
 }
 
-.report-header p {
+.suggest-header p {
   font-size: 15px;
   line-height: 1.6;
   color: #e9f7ff;
 }
 
 
-.report-container {
+.suggest-container {
   width: 80%;
   margin: 30px auto;
 }
 
 
-.report-card {
+.suggest-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -158,7 +155,7 @@ body{
   margin-bottom: 30px;
 }
 
-.report-card h2 {
+.suggest-card h2 {
   color: #0077cc;
   font-size: 22px;
   margin-bottom: 10px;
@@ -197,22 +194,21 @@ body{
   border: 1px solid #ccc;
 }
 
-.report-card label {
+.suggest-card label {
   display: block;
   font-weight: bold;
   margin: 12px 0 5px;
 }
 
-.report-card input[type="text"],
-.report-card select,
-.report-card textarea {
+.suggest-card input[type="text"],
+.suggest-card textarea {
   width: 100%;
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
 
-.report-card textarea {
+.suggest-card textarea {
   resize: vertical;
   min-height: 80px;
 }
@@ -233,12 +229,27 @@ body{
   cursor: pointer;
   transition: all 0.2s ease;
 }
-#submitReport {
+
+.search-btn {
+  background-color: #0077cc;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap; 
+}
+
+
+
+#submitSuggest {
   background: #0077cc;
   color: white;
 }
 
-#submitReport:hover {
+#submitsuggest:hover {
   background: #3399ff;    
   transform: scale(1.03); 
 }
@@ -371,67 +382,25 @@ body{
   line-height: 1.5;
 }
 
-.modal-overlay{
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.45);
-  z-index:0000;
-  justify-content: center;
-  align-items: center;
+.logout-area {
+    width: 100%;
+    text-align: center;
+    margin: 40px 0;
 }
 
-.modal-box{
-  background: white;
-  width: 450px;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.25);
-  animation: fadeIn 0.25s ease;
+.logout-btn {
+    background: #ff4d4d;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.modal-header{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom: 15px;
-}
-
-.modal-header h2{
-  color:#17a34a;
-  font-size: 22px;
-}
-
-.modal-icon{
-  font-size:24px;
-  color:#17a34a;
-  font-weight: bold;
-}
-
-.modal-btn{
-  width: 100%;
-  padding: 12px 0;
-  margin-top: 20px;
-  background: #1a73e8;
-  color: white;
-  border:none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.modal-btn:hover{
-  background: #1669d4;
-}
-
-@keyframes fadeIn{
-  from{opacity: 0;transform: translateY(-10px);}
-  to{opacity: 1;transform: translateY(0);}
+.logout-btn:hover {
+    background: #e60000;
 }
 
 .profile-header{
@@ -539,7 +508,7 @@ h2 {
 
 
 
-.signin-container{
+.signup-container{
   width: 360px;
   background: #ffffff;
   padding: 30px 35px;
@@ -551,7 +520,7 @@ h2 {
   left:50%;
   transform: translateX(-50%);
 }
-.signin-container.title, .signin-container h2{
+.signup-container.title, .signup-container h2{
   text-align: left;
   font-size: 22px;
   font-weight: 700;
@@ -636,6 +605,62 @@ input:focus, select:focus{
 
 .cancel-btn:hover{
   text-decoration: underline;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-box {
+  background: white;
+  padding: 25px;
+  width: 320px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+}
+
+.popup-box h3 {
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.popup-box p {
+  font-size: 15px;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.popup-buttons button {
+  width: 48%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#confirmYes {
+  background-color: #0077cc;
+  color: white;
+}
+
+#confirmNo {
+  background-color: #aaa;
+  color: white;
 }
 
 
