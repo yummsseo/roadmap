@@ -1,83 +1,105 @@
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import requests
-from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from .serializers import Settingser, Notifyser
-from .models import Setting, Notify
-from django.contrib.auth.models import User
-from django.db import IntegrityError
-from django.conf import settings
+import json
+from django.views.generic import TemplateView # 수정
 
-# 설정
-class Settingv(APIView):
-    permission_classes = [IsAuthenticated]
+#def index(request):
+#    return render(request, 'map.html') 
+class MapPageView(TemplateView):
+    template_name = 'main/map.html'
 
-    def post(self, request):        
+
+
+
+@csrf_exempt  
+def get_route(request):
+    if request.method == 'POST':
+        TMAP_APP_KEY = "HRfwcjIwBt78mOxVBBGYH6MSQKPcv7SzadLC0GXh" 
+
         try:
-            instance = Setting.objects.get(user=request.user)
-        except Setting.DoesNotExist:
-            instance = None
-        serializer = Settingser(instance=instance,data=request.data)
-        if serializer.is_valid():
-            setting_ob = serializer.save(user=request.user)
-            
-            return Response (
-                {'status': 'success', 'data': serializer.data}, 
-                status=status.HTTP_200_OK
-            )
-        return Response(
-            {'status': 'error', 'errors': serializer.errors}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    def get(self, request):
-        if not request.user.is_authenticated:
-            return Response(
-                {'status': 'error', 'message': '로그인이 필요합니다.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        try:
-            setting_ob = Setting.objects.get(user=request.user)
-            serializer = Settingser(setting_ob)
-            return Response({'status': 'success', 'data': serializer.data}, status=status.HTTP_200_OK)
-        except Setting.DoesNotExist:
-            return Response({'status': 'error'}, status=status.HTTP_404_NOT_FOUND)
+            received_data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
         
-# 건의
-class Notifyv(ListCreateAPIView):
-    serializer_class = Notifyser
-    permission_classes = [IsAuthenticated]
+        start_lat = received_data.get('startLat')
+        start_lon = received_data.get('startLon')
+        end_lat = received_data.get('endLat')
+        end_lon = received_data.get('endLon')
+        
+        if not all([start_lat, start_lon, end_lat, end_lon]):
+            return JsonResponse({"error": "Missing coordinates"}, status=400)
 
-    def perform_create(self, serializer):
-        locationtext = serializer.validated_data.get('location')
-        latitude = None
-        longitude = None
+        url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1&callback=function"
+        headers = {
+            "appKey": TMAP_APP_KEY,
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "startX": start_lon,
+            "startY": start_lat,
+            "endX": end_lon,
+            "endY": end_lat,
+            "reqCoordType": "WGS84GEO",
+            "resCoordType": "WGS84GEO",
+            "startName": "출발지",
+            "endName": "도착지"
+        }
 
-        TMAP_KEY = settings.TMAP_APP_KEY
-        if locationtext:
-            try:
-                url = "https://apis.openapi.sk.com/tmap/geo/fullAddrGeocoding"
-                response = requests.get(url, params={
-                    "version": "1",
-                    "fullAddr": locationtext,
-                    "appKey": TMAP_KEY
-                })
-                response.raise_for_status()
-                data: dict = response.json()
-                coordinate_data = data.get('coordinateInfo', {}).get('coordinate', [])
-                if coordinate_data:
-                    longitude = float(coordinate_data[0].get('lon')) 
-                    latitude = float(coordinate_data[0].get('lat'))
-            except requests.RequestException as e:
-                print(f"TMap API 호출 실패 : {e}")
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            return JsonResponse({"error": "TMap API Request Failed", "detail": str(e), "status_code": response.status_code}, status=response.status_code)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({"error": "Network Error", "detail": str(e)}, status=500)
 
-        serializer.validated_data['latitude'] = latitude
-        serializer.validated_data['longitude'] = longitude
-        serializer.save()
 
-from django.shortcuts import render,redirect
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login
+        route_data = response.json()
+        path_points = []
+        obstacle_points = []
+        
+        totalDistance = 0
+        
+        for feature in route_data.get('features', []):
+            geometry = feature.get('geometry')
+            properties = feature.get('properties')
 
-# Create your views here.
+            if geometry.get('type') == 'Point':
+                description = properties.get('description', '')
+                facility_type = properties.get('facilityType')
+                
+                # 횡단보도/건널목 체크 (description 기반)
+                if '횡단보도' in description or '건널목' in description:
+                    obstacle_points.append({
+                        'lon': geometry['coordinates'][0],
+                        'lat': geometry['coordinates'][1],
+                        'type': '횡단보도',
+                    })
+                
+                # 기존 장애물(facilityType 기반) 체크 (계단, 경사로, 에스컬레이터 등)
+                elif facility_type in ['11', '12', '21', '22']:
+                    obstacle_points.append({
+                        'lon': geometry['coordinates'][0],
+                        'lat': geometry['coordinates'][1],
+                        'type': description
+                    })
+            
+            elif geometry.get('type') == 'LineString':
+                for coord in geometry.get('coordinates', []):
+                    path_points.append(coord)
+                
+                if 'totalDistance' in properties:
+                    totalDistance = properties.get('totalDistance', 0)
+
+
+        return JsonResponse({
+            "path": path_points,
+            "obstacles": obstacle_points,
+            "distance": totalDistance,
+            "time": properties.get('totalTime', 0)
+        })
+    
+    return JsonResponse({"error": "Only POST requests allowed"}, status=405)
