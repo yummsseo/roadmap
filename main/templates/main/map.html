@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>ROU 맞춤형 경로 웹</title>
+    <style>
+        /* 지도를 화면에 꽉 차게 설정하는 필수 CSS */
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; }
+        #map_div { width: 100%; height: 100%; }
+        
+        /* 정보 표시 창 스타일 */
+        #info {
+            position: absolute; top: 10px; left: 10px; z-index: 1000;
+            background: white; padding: 10px; border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            font-size: 14px;
+        }
+        #info button { margin-top: 5px; cursor: pointer; }
+    </style>
+</head>
+<body onload="initTmap()"> 
+    
+    <div id="info">
+        <b>[경로 검색]</b>
+        <p>출발지: <input type="text" id="start_input" value="강남역" placeholder="출발 장소 이름 또는 주소"></p>
+        <p>도착지: <input type="text" id="end_input" value="서울역" placeholder="도착 장소 이름 또는 주소"></p>
+        <div id="info_text">키워드를 입력 후 '경로 찾기'를 눌러주세요.</div>
+        <button onclick="findPathFromInput()">경로 찾기</button>
+        <button onclick="resetMap()">지도 초기화</button>
+    </div>
+
+    <div id="map_div"></div>
+
+    <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=HRfwcjIwBt78mOxVBBGYH6MSQKPcv7SzadLC0GXh"></script>
+    
+    <script>
+        // --- CSRF 토큰을 가져오는 함수 (Django POST 요청에 필수) ---
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+
+
+        var map;
+        var startMarker, endMarker;
+        var polyline;
+        var obstacleMarkers = []; 
+        
+        // 🎯 출발지 SVG 마커 생성 (크고 진한 초록색 핀 + '출' 글자)
+        function createStartMarkerIcon() {
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="60" viewBox="0 0 50 60">' +
+              // 그림자 효과
+              '<ellipse cx="25" cy="57" rx="8" ry="3" fill="rgba(0,0,0,0.3)"/>' +
+              // 핀 모양 (더 크고 진한 초록색)
+              '<path d="M25 5 C15 5 7 13 7 23 C7 38 25 55 25 55 S43 38 43 23 C43 13 35 5 25 5 Z" ' +
+              'fill="#2E7D32" stroke="white" stroke-width="3"/>' +
+              // 흰색 원 배경
+              '<circle cx="25" cy="23" r="12" fill="white"/>' +
+              // 진한 초록색 테두리
+              '<circle cx="25" cy="23" r="12" fill="none" stroke="#2E7D32" stroke-width="2"/>' +
+              // '출' 글자 (크고 굵게, 안정적인 폰트 설정)
+              '<text x="25" y="30" font-size="18" font-weight="bold" text-anchor="middle" ' +
+              'fill="#2E7D32">출</text>' +
+              '</svg>';
+        return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+
+        // 🎯 도착지 SVG 마커 생성 (크고 진한 빨간색 핀 + '도' 글자)
+        function createEndMarkerIcon() {
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="60" viewBox="0 0 50 60">' +
+              // 그림자 효과
+              '<ellipse cx="25" cy="57" rx="8" ry="3" fill="rgba(0,0,0,0.3)"/>' +
+              // 핀 모양 (더 크고 진한 빨간색)
+              '<path d="M25 5 C15 5 7 13 7 23 C7 38 25 55 25 55 S43 38 43 23 C43 13 35 5 25 5 Z" ' +
+              'fill="#D32F2F" stroke="white" stroke-width="3"/>' +
+              // 흰색 원 배경
+              '<circle cx="25" cy="23" r="12" fill="white"/>' +
+              // 진한 빨간색 테두리
+              '<circle cx="25" cy="23" r="12" fill="none" stroke="#D32F2F" stroke-width="2"/>' +
+              // '도' 글자 (크고 굵게, 안정적인 폰트 설정)
+              '<text x="25" y="30" font-size="18" font-weight="bold" text-anchor="middle" ' +
+              'fill="#D32F2F">도</text>' +
+              '</svg>';
+        return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+        }
+        
+        // 🌟 ROU-3/4: 장애물 종류에 따라 이모티콘을 결정하는 함수 🌟
+        function getMarkerEmoji(typeDescription) {
+            try {
+                var text = typeDescription || '';
+                
+                if (text.includes('계단') || text.includes('층') || text.includes('출구')) { return '🪜'; } 
+                else if (text.includes('육교') || text.includes('다리') || text.includes('고가')) { return '🌉'; } 
+                else if (text.includes('횡단보도') || text.includes('건널목')) { return '🚶'; }
+                else if (text.includes('경사로') || text.includes('램프')) { return '♿'; } 
+                else if (text.includes('엘리베이터') || text.includes('승강기') || text.includes('에스컬레이터')) { return '🛗'; }
+                else if (text.includes('좌회전') || text.includes('우회전')) { return '↪️'; }
+                else if (text.includes('직진') || text.includes('따라')) { return '⬆️'; }
+                
+                return '📍'; 
+            } catch(e) {
+                return '📍';
+            }
+        }
+
+        function createEmojiIcon(emoji, bgColor) {
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">' +
+                '<circle cx="20" cy="20" r="18" fill="' + bgColor + '" stroke="white" stroke-width="2"/>' +
+                '<text x="20" y="28" font-size="20" text-anchor="middle" font-family="Arial">' + emoji + '</text>' +
+                '</svg>'
+            );
+        }
+
+        function getMarkerColor(typeDescription) {
+            var text = typeDescription || '';
+            
+            if (text.includes('계단') || text.includes('육교')) { return '#FF4444'; } 
+            else if (text.includes('경사로') || text.includes('엘리베이터')) { return '#4444FF'; }
+            else if (text.includes('횡단보도')) { return '#FF8800'; }
+            else if (text.includes('회전') || text.includes('직진')) { return '#44AA44'; }
+            
+            return '#888888';
+        }
+        // --- SVG/Emoji 함수 끝 ---
+
+
+        function initTmap() {
+            // 1. 지도 생성 (초기 중심은 서울시청 부근)
+            map = new Tmapv2.Map("map_div", {
+                center: new Tmapv2.LatLng(37.566535, 126.9779692),
+                width: "100%", height: "100%", zoom: 15
+            });
+        }
+        
+        // --- 지도 초기화 함수 (마커 변수도 null로 초기화) ---
+        function resetMarkersAndPath() {
+            // 지도에서 모든 마커/경로 제거
+            if(startMarker) startMarker.setMap(null);
+            if(endMarker) endMarker.setMap(null);
+            if(polyline) polyline.setMap(null);
+            
+            obstacleMarkers.forEach(marker => marker.setMap(null));
+            obstacleMarkers = []; 
+
+            // 🌟 마커 변수를 null로 확실하게 재설정 (재검색 시 오류 방지) 🌟
+            startMarker = null;
+            endMarker = null;
+            polyline = null;
+        }
+        
+        function resetMap() {
+            resetMarkersAndPath();
+            document.getElementById('start_input').value = "";
+            document.getElementById('end_input').value = "";
+            document.getElementById('info_text').innerHTML = "새 경로 찾기 시작. 키워드를 입력해주세요.";
+            map.setCenter(new Tmapv2.LatLng(37.566535, 126.9779692)); 
+            map.setZoom(15);
+        }
+
+
+        // --- 경로 찾기 (텍스트 입력 기반 백엔드 호출) ---
+        function findPathFromInput() {
+            var startText = document.getElementById('start_input').value;
+            var endText = document.getElementById('end_input').value;
+
+            if (!startText || !endText) {
+                document.getElementById('info_text').innerHTML = "❌ 출발지와 도착지 키워드를 모두 입력해주세요.";
+                return;
+            }
+
+            var postData = {
+                start: startText, 
+                end: endText      
+            };
+
+            document.getElementById('info_text').innerHTML = `"${startText}"에서 "${endText}"로 경로를 분석 중입니다...`;
+            // 🌟 경로 검색 전, 기존 경로를 완전히 초기화합니다. 🌟
+            resetMarkersAndPath(); 
+
+            fetch("/api/route/", { 
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrftoken 
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error || errorData.details || `HTTP error! status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => drawLine(data))
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById('info_text').innerHTML = `❌ 경로 탐색 실패: ${error.message}`;
+            });
+        }
+        
+        // --- 경로 그리기 및 장애물 표시 (TMAP GeoJSON 파싱) ---
+        function drawLine(data) {
+            var features = data.features;
+            if (!features || features.length === 0) {
+                alert("경로를 찾지 못했습니다.");
+                document.getElementById('info_text').innerHTML = "❌ 경로 탐색 실패. 보행 가능한 경로가 없습니다.";
+                return; 
+            }
+            
+            var pathPointList = [];
+            var obstaclePoints = [];
+            var totalDistance = 0;
+
+            features.forEach(feature => {
+                var geometry = feature.geometry;
+                var properties = feature.properties;
+                
+                // 1. LineString (경로) 좌표 추출 및 거리 추출
+                if (geometry.type === "LineString" && geometry.coordinates) {
+                    if (properties.totalDistance && totalDistance === 0) {
+                        totalDistance = properties.totalDistance;
+                    }
+                    geometry.coordinates.forEach(coord => {
+                        pathPointList.push(new Tmapv2.LatLng(coord[1], coord[0])); // [위도, 경도] 순서로 변환
+                    });
+                } 
+                
+                // 2. Point (안내/장애물) 좌표 추출
+                if (geometry.type === "Point" && geometry.coordinates) {
+                    var description = properties.description || properties.name || properties.pointType;
+                    
+                    // 출발(12), 도착(11) 지점 마커는 따로 처리
+                    if (properties.pointType === "12") {
+                        startMarker = new Tmapv2.Marker({
+                            position: new Tmapv2.LatLng(geometry.coordinates[1], geometry.coordinates[0]),
+                            map: map, title: "출발지", icon: createStartMarkerIcon(), iconSize: new Tmapv2.Size(50, 60) // 🌟 크기 수정 🌟
+                        });
+                    } else if (properties.pointType === "11") {
+                        endMarker = new Tmapv2.Marker({
+                            position: new Tmapv2.LatLng(geometry.coordinates[1], geometry.coordinates[0]),
+                            map: map, title: "도착지", icon: createEndMarkerIcon(), iconSize: new Tmapv2.Size(50, 60) // 🌟 크기 수정 🌟
+                        });
+                    } else {
+                        // 나머지 안내/장애물 포인트
+                        obstaclePoints.push({
+                            lon: geometry.coordinates[0],
+                            lat: geometry.coordinates[1],
+                            type: description 
+                        });
+                    }
+                }
+            });
+            
+            // 경로선 그리기
+            polyline = new Tmapv2.Polyline({
+                path: pathPointList, strokeColor: "#FF0000", strokeWeight: 6, map: map
+            });
+            
+            // 장애물 마커 그리기
+            obstaclePoints.forEach(obstacle => {
+                var position = new Tmapv2.LatLng(obstacle.lat, obstacle.lon);
+                var emoji = getMarkerEmoji(obstacle.type);
+                var bgColor = getMarkerColor(obstacle.type);
+                var icon = createEmojiIcon(emoji, bgColor);
+                
+                // 장애물 마커는 obstacleMarkers 배열에 추가하여 초기화 시 모두 제거되도록 합니다.
+                var marker = new Tmapv2.Marker({
+                    position: position, map: map, title: obstacle.type || '안내 지점',
+                    icon: icon, iconSize: new Tmapv2.Size(40, 40)
+                });
+                obstacleMarkers.push(marker);
+            });
+            
+            // 지도 영역 설정 및 상태 업데이트
+            if (pathPointList.length > 0) {
+                map.fitBounds(new Tmapv2.LatLngBounds(pathPointList[0], pathPointList[pathPointList.length - 1]));
+            }
+            var distanceKm = (totalDistance / 1000).toFixed(2);
+            document.getElementById('info_text').innerHTML = `✅ 경로 완료! (총 거리: ${distanceKm} km)<br>안내 지점 ${obstaclePoints.length}개 표시.`;
+        }
+    </script>
+</body>
+</html>

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'main',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -59,7 +60,7 @@ ROOT_URLCONF = 'roadmap.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR /'tempaltes'], #수정
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,4 +125,32 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+#윤서 수정
+from decouple import config
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+  'DEFAULT_PERMISSION_CLASSES': [
+    'rest_framework.permissions.IsAuthenticated',
+  ],
+  'DEFAULT_AUTHENTICSATION_CLASSES' : [
+    'rest_framework.authentication.SessionAuthentication',
+  ]
+}
+
+CORS_ALLOWED_ORIGINS = [
+   'https://127.0.0.1:5500', #live server 주소
+   'http://127.0.0.1:8000',
+   'http://127.0.0.1:8001'
+
+]
+CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = False # HTTPS 환경에서만 쿠키가 전송되도록 설정(배포시)
+# HTTP환경에서 개발했기에
+
+#윤서수정
+# 🌟 키를 가져올 때, 양쪽 끝의 공백을 제거합니다. 🌟
+TMAP_API_KEY = config('TMAP_API_KEY').strip()

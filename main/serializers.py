@@ -13,7 +13,7 @@ class Settingser(serializers.ModelSerializer):
             'username',
             'useremail',
             'wheelchair_user', 
-            'blind_user', 
+            'blind_user',   #삭제할 옵션
             'leg_injury_user', 
             'senior_user', 
             'no_stair', 
