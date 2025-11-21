@@ -21,7 +21,6 @@ class Setting(models.Model):
     
     #이동 조건
     wheelchair_user = models.BooleanField(default=False)
-    blind_user = models.BooleanField(default=False) #삭제할 옵션
     leg_injury_user = models.BooleanField(default=False)
     senior_user = models.BooleanField(default=False)
  

@@ -147,7 +147,12 @@ class Settingv(APIView):
             instance = None
         serializer = Settingser(instance=instance,data=request.data, partial = True)
         if serializer.is_valid():
-            setting_ob = serializer.save(user=request.user)
+            if instance:
+                # 1. 기존 객체가 있으면 update() 메서드 호출
+                setting_obj = serializer.save() 
+            else:
+                # 2. 기존 객체가 없으면 create() 메서드 호출 (user 필드 연결)
+                setting_obj = serializer.save(user=request.user)
             
             return Response (
                 {'status': 'success', 'data': serializer.data}, 
