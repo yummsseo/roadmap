@@ -41,12 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'main',
     'users',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -144,14 +146,14 @@ REST_FRAMEWORK = {
 #    'http://127.0.0.1:8000',
 #    'http://127.0.0.1:8001']
 
-CORS_ALLOWD_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = False 
 CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_SAMESITE = 'None'
 # HTTPS 환경에서만 쿠키가 전송되도록 설정(배포시)
 # 하지만 우리는 HTTP환경에서 개발했기에 False로 설정
 
