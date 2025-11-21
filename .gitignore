@@ -1,5 +1,7 @@
 # .gitignore 파일 내용
 
+*.pyc
+
 # 1. 가상환경 폴더
 venv/
 env/

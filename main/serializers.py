@@ -13,7 +13,6 @@ class Settingser(serializers.ModelSerializer):
             'username',
             'useremail',
             'wheelchair_user', 
-            'blind_user', 
             'leg_injury_user', 
             'senior_user', 
             'no_stair', 
@@ -23,7 +22,15 @@ class Settingser(serializers.ModelSerializer):
             'update_at',
         ]
         read_only_fields = ['update_at']
-
+    def update(self, instance, validated_data):   # 검증된 데이터를 반영하고 저장
+        validated_data.pop('user', None)      # views.py에서 save(user=...) 호출 시 받은 user 객체 제거
+        validated_data.pop('username', None)
+        validated_data.pop('useremail', None)
+        for attr, value in validated_data.items():  # 모든 필드(True/False 값)를 기존 객체에 반영
+            setattr(instance, attr, value)
+        
+        instance.save()
+        return instance 
 #건의
 class Notifyser(serializers.ModelSerializer):
     class Meta:
@@ -32,5 +39,6 @@ class Notifyser(serializers.ModelSerializer):
             'location', 
             'description',
             'latitude',
-            'longitude'
+            'longitude',
             ]
+        read_only_fields = ['latitude', 'longitude']
