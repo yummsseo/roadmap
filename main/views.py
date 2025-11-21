@@ -18,7 +18,6 @@ class MapPageView(TemplateView):
     template_name = 'main/map.html'
 
     #context 데이터를 템플릿에 전달
-    #####
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -27,7 +26,6 @@ class MapPageView(TemplateView):
         context['end_key'] = self.request.GET.get('end', '')
         
         return context
-#############
 
 class RouteSearchView(APIView):
     permission_classes = [IsAuthenticated] # 로그인한 사용자만 길찾기 가능
