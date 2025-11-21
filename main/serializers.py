@@ -23,6 +23,9 @@ class Settingser(serializers.ModelSerializer):
         ]
         read_only_fields = ['update_at']
     def update(self, instance, validated_data):   # 검증된 데이터를 반영하고 저장
+            validated_data.pop('users', None)
+            validated_data.pop('username', None)
+            validated_data.pop('useremail', None)
             for attr, value in validated_data.items():  # 모든 필드(True/False 값)를 기존 객체에 반영
                 setattr(instance, attr, value)
         
