@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
-TMAP_APP_KEY = os.environ.get('TMAP_APP_KEY', 'FALLBACK_KEY_FOR_TESTING')
+# TMAP_APP_KEY = os.environ.get('TMAP_APP_KEY', 'FALLBACK_KEY_FOR_TESTING')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,11 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'main',
+    'users',
+    'roadmap'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -59,7 +64,7 @@ ROOT_URLCONF = 'roadmap.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR /'tempaltes'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,4 +129,34 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+  'DEFAULT_PERMISSION_CLASSES': [
+    'rest_framework.permissions.IsAuthenticated',
+  ],
+  'DEFAULT_AUTHENTICATION_CLASSES' : [
+    'rest_framework.authentication.SessionAuthentication',
+    'rest_framework_simplejwt.authentication.JWTAuthentication',
+  ]
+}
+
+# CORS_ALLOWED_ORIGINS = [
+#    'https://127.0.0.1:5500', #live server 주소
+#    'http://127.0.0.1:8000',
+#    'http://127.0.0.1:8001']
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = False 
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = 'None'
+# HTTPS 환경에서만 쿠키가 전송되도록 설정(배포시)
+# 하지만 우리는 HTTP환경에서 개발했기에 False로 설정
+
+TMAP_API_KEY = config('TMAP_API_KEY').strip()

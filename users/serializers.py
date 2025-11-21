@@ -2,7 +2,7 @@ from django.contrib.auth.models import User #Django 내장 기본 user 모델
 from django.contrib.auth.password_validation import validate_password #비밀번호 유효성 검사기
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-
+from .models import UserProfile
 
 class UserCreationSerializer(serializers.ModelSerializer):
   password = serializers.CharField(write_only = True, required = True, validators = [validate_password])
@@ -22,3 +22,7 @@ class UserCreationSerializer(serializers.ModelSerializer):
     )
     return user
   
+class UserProfileSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = UserProfile
+    fields = '__all__'
