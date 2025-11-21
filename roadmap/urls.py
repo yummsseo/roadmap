@@ -29,11 +29,13 @@ urlpatterns = [
     # 관리자 페이지
     path('admin/', admin.site.urls),
     
-    # 💡 [핵심] 로그인(토큰 발급) 및 토큰 갱신 엔드포인트 추가
+    # JWT 토큰 발급 및 갱신
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
-    # 앱별 URL 연결 (users 앱과 roadmap 앱)
+    # 사용자 관련 API
     path('api/users/', include('users.urls')),
-    path('api/roadmap/', include('roadmap.urls')),
+    
+    # 메인 기능 API
+    path('api/', include('main.urls')),
 ]

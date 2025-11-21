@@ -4,7 +4,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # views_shin 모듈을 통해 접근
     path('setting/', views.Settingv.as_view(), name='user_setting'), 
     path('notify/', views.Notifyv.as_view(), name='user_notify'),
     
