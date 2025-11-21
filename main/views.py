@@ -18,7 +18,7 @@ class MapPageView(TemplateView):
     template_name = 'main/map.html'
 
     #context 데이터를 템플릿에 전달
-    #####??
+    #####
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -141,18 +141,11 @@ class Settingv(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):        
-        try:
-            instance = Setting.objects.get(user=request.user)
-        except Setting.DoesNotExist:
-            instance = None
-        serializer = Settingser(instance=instance,data=request.data, partial = True)
+        instance, created = Setting.objects.get_or_create(user=request.user)
+        
+        serializer = Settingser(instance=instance,data=request.data, partial=True)
         if serializer.is_valid():
-            if instance:
-                # 1. 기존 객체가 있으면 update() 메서드 호출
-                setting_obj = serializer.save() 
-            else:
-                # 2. 기존 객체가 없으면 create() 메서드 호출 (user 필드 연결)
-                setting_obj = serializer.save(user=request.user)
+            serializer.save(user=request.user)
             
             return Response (
                 {'status': 'success', 'data': serializer.data}, 
@@ -163,11 +156,6 @@ class Settingv(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
     def get(self, request):
-        if not request.user.is_authenticated:
-            return Response(
-                {'status': 'error', 'message': '로그인이 필요합니다.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
         setting_obj, created = Setting.objects.get_or_create(user=request.user)
         serializer = Settingser(setting_obj)
         return Response({'status': 'success', 'data': serializer.data}, status=status.HTTP_200_OK)
