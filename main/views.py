@@ -145,7 +145,7 @@ class Settingv(APIView):
             instance = Setting.objects.get(user=request.user)
         except Setting.DoesNotExist:
             instance = None
-        serializer = Settingser(instance=instance,data=request.data)
+        serializer = Settingser(instance=instance,data=request.data, partial = True)
         if serializer.is_valid():
             setting_ob = serializer.save(user=request.user)
             

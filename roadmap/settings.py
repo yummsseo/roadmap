@@ -134,21 +134,24 @@ REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': [
     'rest_framework.permissions.IsAuthenticated',
   ],
-  'DEFAULT_AUTHENTICSATION_CLASSES' : [
+  'DEFAULT_AUTHENTICATION_CLASSES' : [
     'rest_framework.authentication.SessionAuthentication',
   ]
 }
 
-CORS_ALLOWED_ORIGINS = [
-   'https://127.0.0.1:5500', #live server 주소
-   'http://127.0.0.1:8000',
-   'http://127.0.0.1:8001'
+# CORS_ALLOWED_ORIGINS = [
+#    'https://127.0.0.1:5500', #live server 주소
+#    'http://127.0.0.1:8000',
+#    'http://127.0.0.1:8001']
 
-]
+CORS_ALLOWD_ALL_ORIGINS = True
+
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = False 
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = None
 # HTTPS 환경에서만 쿠키가 전송되도록 설정(배포시)
 # 하지만 우리는 HTTP환경에서 개발했기에 False로 설정
 
