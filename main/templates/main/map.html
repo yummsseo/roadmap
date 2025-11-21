@@ -90,12 +90,14 @@
             var text = typeDescription || '';
             
             if (text.includes('계단')) { return '🪜'; } 
-            else if(text.includes('출구') || text.includes('층')) {return '🔚'}
+            // else if(text.includes('출구') || text.includes('층')) {return '🔚'}
             else if (text.includes('육교') || text.includes('다리') || text.includes('고가')) { return '🌉'; } 
-            else if (text.includes('횡단보도') || text.includes('건널목')) { return '🚦'; } // 횡단보도
+            else if (text.includes('횡단보도') || text.includes('건널목')) { return '🚦'; }
             else if (text.includes('경사로') || text.includes('램프')) { return '♿'; } 
             else if (text.includes('엘리베이터') || text.includes('승강기') || text.includes('에스컬레이터')) { return '🛗'; }
-            else if (text.includes('좌회전') || text.includes('우회전') || text.includes('직진')) { return '⬆️'; } // 경로 안내
+            else if (text.includes('좌회전'))  {return '⬅️'} 
+            else if (text.includes('우회전')) {return '➡️'}
+            else if (text.includes('직진')) { return '⬆️'; } 
             
             return '📍'; 
         }

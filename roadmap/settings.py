@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 from decouple import config
 
-TMAP_APP_KEY = os.environ.get('TMAP_APP_KEY', 'FALLBACK_KEY_FOR_TESTING')
+# TMAP_APP_KEY = os.environ.get('TMAP_APP_KEY', 'FALLBACK_KEY_FOR_TESTING')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,7 +127,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 
-DEFAULT_AUTO_FIELD = 'django.db.moels.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {

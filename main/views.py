@@ -1,3 +1,5 @@
+main>views.py
+
 from django.conf import settings
 from django.shortcuts import redirect
 import requests
@@ -23,8 +25,8 @@ class MapPageView(TemplateView):
         context = super().get_context_data(**kwargs)
         
         # GET 요청에서 'start'와 'end' 쿼리 파라미터를 가져와 컨텍스트에 저장
-        context['start_key'] = self.request.GET.get('start', '출발지 입력')
-        context['end_key'] = self.request.GET.get('end', '도착지 입력')
+        context['start_key'] = self.request.GET.get('start', '')
+        context['end_key'] = self.request.GET.get('end', '')
         
         return context
 #############
@@ -178,11 +180,11 @@ class Notifyv(ListCreateAPIView):
         latitude = None
         longitude = None
 
-        TMAP_APP_KEY = settings.TMAP_APP_KEY
+        TMAP_API_KEY = settings.TMAP_API_KEY
         if locationtext:
             try:
                 url = "https://apis.openapi.sk.com/tmap/geo/fullAddrGeo"
-                headers = {"Accept": "application/json", "appkey": TMAP_APP_KEY }
+                headers = {"Accept": "application/json", "appKey": TMAP_API_KEY }
                 params={
                     "version": "1",
                     "format": "json",
