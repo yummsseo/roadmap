@@ -3,7 +3,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>모두의길 | 경로 찾기</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style2.css">
 </head>
 <body>
   <!--헤더-->
@@ -12,15 +12,14 @@
     <nav>
       <ul>
         <li><a href="index.html">홈</a></li>
-        <li><a href="route.html" class="active">경로 찾기</a></li>
-        <li><a href="#">장애물 제보</a></li>
-        <li><a href="#">프로필</a></li>
-        <li><a href="#">설정</a></li>
+        <li><a href="route.html">경로 찾기</a></li>
+        <li><a href="suggest.html">건의하기</a></li>
+        <li><a href="setting.html">설정</a></li>
       </ul>
     </nav>
     <div class="auth-buttons">
-      <button class="login-btn">로그인</button>
-      <button class="signup-btn">회원가입</button>
+      <button class="login-btn" onclick="location.href='login.html'">로그인</button>
+      <button class="signup-btn" onclick="location.href='signup.html'">회원가입</button>
     </div>
   </header>
 
@@ -45,7 +44,7 @@
   <footer>
     <p>© 2025 모두의길 | 모두를 위한 길 안내</p>
   </footer>
-
+  <script src="script2.js"></script>
   <script src="script/search.js"></script>
   <script src="script/route.js"></script>
   <script src="script/main.js"></script>
