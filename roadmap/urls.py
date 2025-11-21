@@ -21,7 +21,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-   # path('api/', include('main.urls')),
-    path('api/', include('main.urls_shin')), #나중에 위를 추가
-    path('api/users/', include('users.urls')), ##윤서추가
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api/', include('main.urls')),
+    path('api/users/', include('users.urls')), 
+] 
