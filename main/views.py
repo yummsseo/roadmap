@@ -1,5 +1,3 @@
-main>views.py
-
 from django.conf import settings
 from django.shortcuts import redirect
 import requests
