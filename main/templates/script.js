@@ -55,6 +55,7 @@ function searchPOI(keyword) {
             alert("장소 검색 중 오류가 발생했습니다.");
         });
 }
+
 document.getElementById("submitSuggest").addEventListener("click", function(e) {
     e.preventDefault(); 
 
